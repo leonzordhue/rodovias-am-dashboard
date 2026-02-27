@@ -68,7 +68,6 @@
     gap: 16px;
   }
 
-  .logo-area {}
   .logo-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -166,31 +165,34 @@
 
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .config-input {
-    flex: 1; min-width: 280px;
+  /* ID fixo, não precisa de input, mas mantemos a linha de filtros */
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .search-wrap {
     display: flex; align-items: center; gap: 10px;
     background: var(--bg3);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px 14px;
+    padding: 7px 14px;
+    flex: 2;
+    min-width: 250px;
   }
-  .config-input label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  .config-input input {
-    flex: 1;
+  .search-wrap input {
     background: transparent;
-    border: none;
-    outline: none;
+    border: none; outline: none;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    width: 100%;
   }
+  .search-wrap input::placeholder { color: var(--muted); }
 
-  /* NOVO: estilo para o dropdown de rodovias */
   .filter-select {
     background: var(--bg3);
     border: 1px solid var(--border);
@@ -201,7 +203,7 @@
     font-size: 12px;
     outline: none;
     cursor: pointer;
-    min-width: 180px;
+    min-width: 200px;
   }
   .filter-select:hover {
     border-color: var(--acc);
@@ -358,24 +360,6 @@
     flex-wrap: wrap;
     gap: 12px;
   }
-  .table-header-left {}
-
-  .search-wrap {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 14px;
-  }
-  .search-wrap input {
-    background: transparent;
-    border: none; outline: none;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    width: 220px;
-  }
-  .search-wrap input::placeholder { color: var(--muted); }
 
   .table-wrap { overflow-x: auto; }
 
@@ -548,13 +532,8 @@
   </div>
 </header>
 
-<!-- CONTROLES -->
+<!-- CONTROLES PRINCIPAIS (sem input de ID, apenas botões) -->
 <div class="controls">
-  <div class="config-input">
-    <label>SHEETS ID:</label>
-    <input type="text" id="sheetId" placeholder="Cole o ID da sua planilha aqui"
-           value="">
-  </div>
   <button class="btn btn-primary" id="btnCarregar" onclick="carregarDados()">
     ▶ Carregar Dados
   </button>
@@ -566,62 +545,66 @@
   </button>
 </div>
 
-<!-- LINHA DE FILTROS (BUSCA + SELETOR DE RODOVIA) -->
+<!-- LINHA DE FILTROS (busca + rodovia + botão pesquisar) -->
 <div class="controls" style="border-top: none; padding-top: 0; padding-bottom: 20px;">
-  <div class="search-wrap" style="flex:2;">
-    <span style="color:var(--muted);font-size:13px">🔍</span>
-    <input type="text" id="searchInput" placeholder="Filtrar por título, rodovia, município, fonte..." oninput="filtrarTabela()">
-  </div>
+  <div class="filter-row">
+    <div class="search-wrap">
+      <span style="color:var(--muted);font-size:13px">🔍</span>
+      <input type="text" id="searchInput" placeholder="Título, rodovia, município, fonte...">
+    </div>
 
-  <!-- DROPDOWN DE RODOVIAS (LISTA FORNECIDA) -->
-  <select class="filter-select" id="rodoviaSelect" onchange="filtrarTabela()">
-    <option value="">Todas as rodovias</option>
-    <optgroup label="🛣️  Rodovias Estaduais (AM)">
-      <option value="AM-010">AM-010</option>
-      <option value="AM-020">AM-020</option>
-      <option value="AM-070">AM-070</option>
-      <option value="AM-151">AM-151</option>
-      <option value="AM-170">AM-170</option>
-      <option value="AM-175">AM-175</option>
-      <option value="AM-239">AM-239</option>
-      <option value="AM-240">AM-240</option>
-      <option value="AM-249">AM-249</option>
-      <option value="AM-254">AM-254</option>
-      <option value="AM-280">AM-280</option>
-      <option value="AM-326">AM-326</option>
-      <option value="AM-328">AM-328</option>
-      <option value="AM-329">AM-329</option>
-      <option value="AM-330">AM-330</option>
-      <option value="AM-336">AM-336</option>
-      <option value="AM-343">AM-343</option>
-      <option value="AM-351">AM-351</option>
-      <option value="AM-352">AM-352</option>
-      <option value="AM-354">AM-354</option>
-      <option value="AM-356">AM-356</option>
-      <option value="AM-360">AM-360</option>
-      <option value="AM-362">AM-362</option>
-      <option value="AM-363">AM-363</option>
-      <option value="AM-364">AM-364</option>
-      <option value="AM-366">AM-366</option>
-      <option value="AM-374">AM-374</option>
-      <option value="AM-378">AM-378</option>
-      <option value="AM-449">AM-449</option>
-      <option value="AM-450">AM-450</option>
-      <option value="AM-451">AM-451</option>
-      <option value="AM-452">AM-452</option>
-      <option value="AM-453">AM-453</option>
-      <option value="AM-466">AM-466</option>
-    </optgroup>
-    <optgroup label="🛣️  Rodovias Federais (BR)">
-      <option value="BR-174">BR-174</option>
-      <option value="BR-319">BR-319</option>
-      <option value="BR-230">BR-230</option>
-      <option value="BR-317">BR-317</option>
-      <option value="BR-307">BR-307</option>
-      <option value="BR-411">BR-411</option>
-      <option value="BR-413">BR-413</option>
-    </optgroup>
-  </select>
+    <select class="filter-select" id="rodoviaSelect">
+      <option value="">Todas as rodovias</option>
+      <optgroup label="🛣️  Rodovias Estaduais (AM)">
+        <option value="AM-010">AM-010</option>
+        <option value="AM-020">AM-020</option>
+        <option value="AM-070">AM-070</option>
+        <option value="AM-151">AM-151</option>
+        <option value="AM-170">AM-170</option>
+        <option value="AM-175">AM-175</option>
+        <option value="AM-239">AM-239</option>
+        <option value="AM-240">AM-240</option>
+        <option value="AM-249">AM-249</option>
+        <option value="AM-254">AM-254</option>
+        <option value="AM-280">AM-280</option>
+        <option value="AM-326">AM-326</option>
+        <option value="AM-328">AM-328</option>
+        <option value="AM-329">AM-329</option>
+        <option value="AM-330">AM-330</option>
+        <option value="AM-336">AM-336</option>
+        <option value="AM-343">AM-343</option>
+        <option value="AM-351">AM-351</option>
+        <option value="AM-352">AM-352</option>
+        <option value="AM-354">AM-354</option>
+        <option value="AM-356">AM-356</option>
+        <option value="AM-360">AM-360</option>
+        <option value="AM-362">AM-362</option>
+        <option value="AM-363">AM-363</option>
+        <option value="AM-364">AM-364</option>
+        <option value="AM-366">AM-366</option>
+        <option value="AM-374">AM-374</option>
+        <option value="AM-378">AM-378</option>
+        <option value="AM-449">AM-449</option>
+        <option value="AM-450">AM-450</option>
+        <option value="AM-451">AM-451</option>
+        <option value="AM-452">AM-452</option>
+        <option value="AM-453">AM-453</option>
+        <option value="AM-466">AM-466</option>
+      </optgroup>
+      <optgroup label="🛣️  Rodovias Federais (BR)">
+        <option value="BR-174">BR-174</option>
+        <option value="BR-319">BR-319</option>
+        <option value="BR-230">BR-230</option>
+        <option value="BR-317">BR-317</option>
+        <option value="BR-307">BR-307</option>
+        <option value="BR-411">BR-411</option>
+        <option value="BR-413">BR-413</option>
+      </optgroup>
+    </select>
+
+    <button class="btn btn-primary" onclick="aplicarFiltros()">🔎 Pesquisar</button>
+    <button class="btn btn-secondary" onclick="limparFiltros()">Limpar</button>
+  </div>
 </div>
 
 <!-- ALERT -->
@@ -711,7 +694,6 @@
         <div class="chart-title">Todas as Notícias</div>
         <div class="chart-sub" id="tableInfo">—</div>
       </div>
-      <!-- Os filtros estão na linha superior, apenas repetimos a info -->
     </div>
     <div class="table-wrap">
       <table id="tabelaNoticias">
@@ -733,7 +715,7 @@
             <div class="empty-state">
               <div class="empty-icon">📡</div>
               <div class="empty-title">Aguardando dados</div>
-              <div class="empty-sub">Insira o ID da planilha e clique em "Carregar Dados"</div>
+              <div class="empty-sub">Clique em "Carregar Dados" para iniciar</div>
             </div>
           </td></tr>
         </tbody>
@@ -754,10 +736,15 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────
+// CONFIGURAÇÕES FIXAS
+// ─────────────────────────────────────────────────────────────
+const SHEET_ID = "1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE"; // ID fixo da sua planilha
+
+// ─────────────────────────────────────────────────────────────
 // ESTADO GLOBAL
 // ─────────────────────────────────────────────────────────────
-var todosRegistros  = [];
-var registrosFiltro = [];
+var todosRegistros  = [];      // todos os dados carregados da planilha (já filtrados para exibir apenas AM)
+var registrosFiltro = [];      // registros após aplicação dos filtros (busca + rodovia)
 var paginaAtual     = 1;
 var itensPorPagina  = 25;
 var charts          = {};
@@ -801,22 +788,13 @@ function cores(n) {
 // CARREGAR DADOS DO GOOGLE SHEETS (CSV público)
 // ─────────────────────────────────────────────────────────────
 function carregarDados() {
-  var id = document.getElementById('sheetId').value.trim();
-  if (!id || id === 'COLE_O_ID_DA_SUA_PLANILHA_AQUI') {
-    showAlert('⚠️  Cole o ID da sua planilha Google Sheets no campo acima.', 'error');
-    return;
-  }
-
-  // Salva ID localmente
-  try { localStorage.setItem('sheetId', id); } catch(e) {}
-
   showLoader('Buscando dados da planilha...');
   document.getElementById('btnCarregar').disabled = true;
 
-  // URL de exportação CSV pública (planilha precisa estar compartilhada como "qualquer um pode ver")
-  var urlNoticias = 'https://docs.google.com/spreadsheets/d/' + id +
+  // URL de exportação CSV pública
+  var urlNoticias = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
                     '/gviz/tq?tqx=out:csv&sheet=Noticias';
-  var urlDash     = 'https://docs.google.com/spreadsheets/d/' + id +
+  var urlDash     = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
                     '/gviz/tq?tqx=out:csv&sheet=Dashboard_Dados';
 
   Promise.all([
@@ -830,12 +808,19 @@ function carregarDados() {
     var csvNoticias  = results[0];
     var csvDash      = results[1];
 
-    todosRegistros   = parseCSV(csvNoticias);
-    var dashData     = parseCSV(csvDash);
+    var todos = parseCSV(csvNoticias);
+    var dashData = parseCSV(csvDash);
 
-    if (todosRegistros.length === 0) {
+    if (todos.length === 0) {
       throw new Error('Nenhuma notícia encontrada na aba "Noticias". Rode o script Python primeiro.');
     }
+
+    // Filtra para manter apenas notícias com Tipo de Via "Federal" ou "Estadual"
+    // (elimina "Nao identificada" que podem ser de outros estados)
+    todosRegistros = todos.filter(function(n) {
+      var tipoVia = (n['Tipo de Via'] || '').trim();
+      return tipoVia === 'Federal' || tipoVia === 'Estadual';
+    });
 
     document.getElementById('statusText').textContent = 'Dados carregados';
     document.getElementById('lastUpdate').textContent =
@@ -843,10 +828,11 @@ function carregarDados() {
 
     renderKPIs(dashData, todosRegistros);
     renderCharts(dashData, todosRegistros);
+    // Inicialmente, registrosFiltro = todosRegistros (sem filtros)
     registrosFiltro = todosRegistros.slice();
     renderTabela();
 
-    showAlert('✅ ' + todosRegistros.length + ' notícias carregadas com sucesso!', 'success');
+    showAlert('✅ ' + todosRegistros.length + ' notícias carregadas (apenas rodovias AM/BR).', 'success');
   })
   .catch(function(err) {
     showAlert('❌ ' + err.message, 'error');
@@ -898,7 +884,6 @@ function parseCSVLine(line) {
 // KPIs (usam dados completos, não filtrados)
 // ─────────────────────────────────────────────────────────────
 function renderKPIs(dashData, noticias) {
-  // Tenta pegar dos dados do dashboard primeiro
   var total     = noticias.length;
   var rodovias  = 0, municipios = 0, fatais = 0;
 
@@ -1092,23 +1077,11 @@ function renderCharts(dashData, noticias) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// TABELA + FILTROS
+// APLICAR FILTROS (chamado pelo botão Pesquisar)
 // ─────────────────────────────────────────────────────────────
-function badgeVia(v) {
-  if (!v) return '<span class="badge badge-ni">—</span>';
-  if (v === 'Federal')  return '<span class="badge badge-federal">Federal</span>';
-  if (v === 'Estadual') return '<span class="badge badge-estadual">Estadual</span>';
-  return '<span class="badge badge-ni">N/I</span>';
-}
-function badgeTipo(v) {
-  if (!v) return '<span class="badge badge-geral">—</span>';
-  if (v.includes('Fatal')) return '<span class="badge badge-fatal">' + v + '</span>';
-  return '<span class="badge badge-geral">' + v + '</span>';
-}
-
-function filtrarTabela() {
+function aplicarFiltros() {
   var q = document.getElementById('searchInput').value.toLowerCase();
-  var rodoviaSel = document.getElementById('rodoviaSelect').value; // pode ser vazio (todas)
+  var rodoviaSel = document.getElementById('rodoviaSelect').value;
 
   registrosFiltro = todosRegistros.filter(function(n) {
     // Filtro de busca geral
@@ -1123,7 +1096,6 @@ function filtrarTabela() {
     // Filtro de rodovia específica
     if (rodoviaSel !== '') {
       var rodoviaNoticia = (n['Rodovia'] || '').toUpperCase();
-      // Verifica se a rodovia selecionada aparece como parte do campo (ex: "BR-174 / AM-070")
       return rodoviaNoticia.includes(rodoviaSel.toUpperCase());
     }
     return true;
@@ -1131,6 +1103,29 @@ function filtrarTabela() {
 
   paginaAtual = 1;
   renderTabela();
+}
+
+function limparFiltros() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('rodoviaSelect').value = '';
+  registrosFiltro = todosRegistros.slice();
+  paginaAtual = 1;
+  renderTabela();
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDERIZAR TABELA (com paginação)
+// ─────────────────────────────────────────────────────────────
+function badgeVia(v) {
+  if (!v) return '<span class="badge badge-ni">—</span>';
+  if (v === 'Federal')  return '<span class="badge badge-federal">Federal</span>';
+  if (v === 'Estadual') return '<span class="badge badge-estadual">Estadual</span>';
+  return '<span class="badge badge-ni">N/I</span>';
+}
+function badgeTipo(v) {
+  if (!v) return '<span class="badge badge-geral">—</span>';
+  if (v.includes('Fatal')) return '<span class="badge badge-fatal">' + v + '</span>';
+  return '<span class="badge badge-geral">' + v + '</span>';
 }
 
 function renderTabela() {
@@ -1219,13 +1214,11 @@ function exportarCSV() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// INIT
+// INICIALIZAÇÃO (carrega dados automaticamente ao abrir a página)
 // ─────────────────────────────────────────────────────────────
 (function init() {
-  try {
-    var saved = localStorage.getItem('sheetId');
-    if (saved) document.getElementById('sheetId').value = saved;
-  } catch(e) {}
+  // Carrega os dados assim que a página for aberta
+  carregarDados();
 })();
 </script>
 </body>
