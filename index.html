@@ -33,7 +33,6 @@
     overflow-x: hidden;
   }
 
-  /* NOISE OVERLAY */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -41,7 +40,6 @@
     pointer-events: none; z-index: 0;
   }
 
-  /* GRID BACKGROUND */
   body::after {
     content: '';
     position: fixed; inset: 0;
@@ -52,7 +50,6 @@
     pointer-events: none; z-index: 0;
   }
 
-  /* HEADER */
   header {
     position: relative; z-index: 10;
     padding: 32px 48px 24px;
@@ -68,6 +65,7 @@
     gap: 16px;
   }
 
+  .logo-area {}
   .logo-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
@@ -127,7 +125,6 @@
     color: var(--muted);
   }
 
-  /* CONTROLES */
   .controls {
     position: relative; z-index: 10;
     padding: 20px 48px;
@@ -165,34 +162,6 @@
 
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* ID fixo, não precisa de input, mas mantemos a linha de filtros */
-  .filter-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .search-wrap {
-    display: flex; align-items: center; gap: 10px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 14px;
-    flex: 2;
-    min-width: 250px;
-  }
-  .search-wrap input {
-    background: transparent;
-    border: none; outline: none;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    width: 100%;
-  }
-  .search-wrap input::placeholder { color: var(--muted); }
-
   .filter-select {
     background: var(--bg3);
     border: 1px solid var(--border);
@@ -203,21 +172,12 @@
     font-size: 12px;
     outline: none;
     cursor: pointer;
-    min-width: 200px;
+    min-width: 180px;
   }
   .filter-select:hover {
     border-color: var(--acc);
   }
-  .filter-select optgroup {
-    color: var(--muted);
-    font-weight: 600;
-  }
-  .filter-select option {
-    background: var(--bg3);
-    color: var(--text);
-  }
 
-  /* ALERT */
   .alert {
     position: relative; z-index: 10;
     margin: 16px 48px;
@@ -231,7 +191,6 @@
   .alert.info    { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd; }
   .alert.show    { display: block; }
 
-  /* MAIN */
   main {
     position: relative; z-index: 10;
     padding: 32px 48px;
@@ -239,7 +198,6 @@
     margin: 0 auto;
   }
 
-  /* KPIs */
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -293,7 +251,6 @@
     opacity: 0.15;
   }
 
-  /* CHARTS GRID */
   .charts-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -343,7 +300,6 @@
   }
   .chart-wrap.tall { height: 340px; }
 
-  /* TABELA */
   .table-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -360,6 +316,24 @@
     flex-wrap: wrap;
     gap: 12px;
   }
+  .table-header-left {}
+
+  .search-wrap {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+  }
+  .search-wrap input {
+    background: transparent;
+    border: none; outline: none;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    width: 220px;
+  }
+  .search-wrap input::placeholder { color: var(--muted); }
 
   .table-wrap { overflow-x: auto; }
 
@@ -410,7 +384,6 @@
   }
   td a:hover { text-decoration: underline; }
 
-  /* PAGINAÇÃO */
   .pagination {
     display: flex;
     align-items: center;
@@ -441,7 +414,6 @@
   .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .page-btn.active { background: var(--acc); border-color: var(--acc); color: #fff; }
 
-  /* LOADER */
   .loader-overlay {
     display: none;
     position: fixed; inset: 0;
@@ -467,7 +439,6 @@
     color: var(--muted);
   }
 
-  /* EMPTY STATE */
   .empty-state {
     padding: 60px 24px;
     text-align: center;
@@ -476,7 +447,6 @@
   .empty-title { font-size: 16px; color: var(--muted); margin-bottom: 8px; }
   .empty-sub { font-size: 12px; color: var(--muted); opacity: 0.6; font-family: 'JetBrains Mono', monospace; }
 
-  /* FOOTER */
   footer {
     position: relative; z-index: 10;
     padding: 24px 48px;
@@ -493,7 +463,6 @@
     color: var(--muted);
   }
 
-  /* SECTION TITLE */
   .section-title {
     font-size: 11px;
     font-family: 'JetBrains Mono', monospace;
@@ -508,13 +477,11 @@
 </head>
 <body>
 
-<!-- LOADER -->
 <div class="loader-overlay" id="loader">
   <div class="loader-ring"></div>
   <div class="loader-text" id="loaderText">Carregando dados...</div>
 </div>
 
-<!-- HEADER -->
 <header>
   <div class="header-top">
     <div class="logo-area">
@@ -532,7 +499,6 @@
   </div>
 </header>
 
-<!-- CONTROLES PRINCIPAIS (sem input de ID, apenas botões) -->
 <div class="controls">
   <button class="btn btn-primary" id="btnCarregar" onclick="carregarDados()">
     ▶ Carregar Dados
@@ -541,79 +507,26 @@
     ↓ Exportar CSV
   </button>
   <button class="btn btn-secondary" onclick="window.location.reload()">
-    ↺ Recarregar
+    ↺ Recarregar Página
   </button>
 </div>
 
-<!-- LINHA DE FILTROS (busca + rodovia + botão pesquisar) -->
 <div class="controls" style="border-top: none; padding-top: 0; padding-bottom: 20px;">
-  <div class="filter-row">
-    <div class="search-wrap">
-      <span style="color:var(--muted);font-size:13px">🔍</span>
-      <input type="text" id="searchInput" placeholder="Título, rodovia, município, fonte...">
-    </div>
-
-    <select class="filter-select" id="rodoviaSelect">
-      <option value="">Todas as rodovias</option>
-      <optgroup label="🛣️  Rodovias Estaduais (AM)">
-        <option value="AM-010">AM-010</option>
-        <option value="AM-020">AM-020</option>
-        <option value="AM-070">AM-070</option>
-        <option value="AM-151">AM-151</option>
-        <option value="AM-170">AM-170</option>
-        <option value="AM-175">AM-175</option>
-        <option value="AM-239">AM-239</option>
-        <option value="AM-240">AM-240</option>
-        <option value="AM-249">AM-249</option>
-        <option value="AM-254">AM-254</option>
-        <option value="AM-280">AM-280</option>
-        <option value="AM-326">AM-326</option>
-        <option value="AM-328">AM-328</option>
-        <option value="AM-329">AM-329</option>
-        <option value="AM-330">AM-330</option>
-        <option value="AM-336">AM-336</option>
-        <option value="AM-343">AM-343</option>
-        <option value="AM-351">AM-351</option>
-        <option value="AM-352">AM-352</option>
-        <option value="AM-354">AM-354</option>
-        <option value="AM-356">AM-356</option>
-        <option value="AM-360">AM-360</option>
-        <option value="AM-362">AM-362</option>
-        <option value="AM-363">AM-363</option>
-        <option value="AM-364">AM-364</option>
-        <option value="AM-366">AM-366</option>
-        <option value="AM-374">AM-374</option>
-        <option value="AM-378">AM-378</option>
-        <option value="AM-449">AM-449</option>
-        <option value="AM-450">AM-450</option>
-        <option value="AM-451">AM-451</option>
-        <option value="AM-452">AM-452</option>
-        <option value="AM-453">AM-453</option>
-        <option value="AM-466">AM-466</option>
-      </optgroup>
-      <optgroup label="🛣️  Rodovias Federais (BR)">
-        <option value="BR-174">BR-174</option>
-        <option value="BR-319">BR-319</option>
-        <option value="BR-230">BR-230</option>
-        <option value="BR-317">BR-317</option>
-        <option value="BR-307">BR-307</option>
-        <option value="BR-411">BR-411</option>
-        <option value="BR-413">BR-413</option>
-      </optgroup>
-    </select>
-
-    <button class="btn btn-primary" onclick="aplicarFiltros()">🔎 Pesquisar</button>
-    <button class="btn btn-secondary" onclick="limparFiltros()">Limpar</button>
+  <div class="search-wrap" style="flex:2;">
+    <span style="color:var(--muted);font-size:13px">🔍</span>
+    <input type="text" id="searchInput" placeholder="Filtrar por título, rodovia, município, fonte...">
   </div>
+  <select class="filter-select" id="rodoviaSelect">
+    <option value="">Todas as rodovias</option>
+  </select>
+  <button class="btn btn-primary" id="btnFiltrar" onclick="aplicarFiltros()">
+    🔎 Aplicar Filtros
+  </button>
 </div>
 
-<!-- ALERT -->
 <div class="alert" id="alert"></div>
 
-<!-- MAIN -->
 <main>
-
-  <!-- KPIs -->
   <div class="section-title">indicadores gerais</div>
   <div class="kpi-grid" id="kpiGrid">
     <div class="kpi-card">
@@ -642,7 +555,6 @@
     </div>
   </div>
 
-  <!-- GRÁFICOS LINHA 1 -->
   <div class="section-title">distribuição por categoria</div>
   <div class="charts-grid">
     <div class="chart-card">
@@ -661,7 +573,6 @@
     </div>
   </div>
 
-  <!-- GRÁFICOS LINHA 2 -->
   <div class="charts-grid triple">
     <div class="chart-card">
       <div class="chart-title">Municípios com Mais Ocorrências</div>
@@ -686,7 +597,6 @@
     </div>
   </div>
 
-  <!-- TABELA -->
   <div class="section-title">notícias coletadas</div>
   <div class="table-card">
     <div class="table-header">
@@ -726,7 +636,6 @@
       <div class="page-btns" id="pageBtns"></div>
     </div>
   </div>
-
 </main>
 
 <footer>
@@ -735,23 +644,19 @@
 </footer>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-// CONFIGURAÇÕES FIXAS
-// ─────────────────────────────────────────────────────────────
-const SHEET_ID = "1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE"; // ID fixo da sua planilha
+// ================== CONFIGURAÇÕES ==================
+const SHEET_ID = '1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE';
+const SHEET_NAME = 'Noticias';
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}&t=${Date.now()}`;
 
-// ─────────────────────────────────────────────────────────────
-// ESTADO GLOBAL
-// ─────────────────────────────────────────────────────────────
-var todosRegistros  = [];      // todos os dados carregados da planilha (já filtrados para exibir apenas AM)
-var registrosFiltro = [];      // registros após aplicação dos filtros (busca + rodovia)
+// ================== ESTADO GLOBAL ==================
+var todosRegistros  = [];
+var registrosFiltro = [];
 var paginaAtual     = 1;
 var itensPorPagina  = 25;
 var charts          = {};
 
-// ─────────────────────────────────────────────────────────────
-// UTILITÁRIOS
-// ─────────────────────────────────────────────────────────────
+// ================== UTILITÁRIOS ==================
 function showLoader(msg) {
   document.getElementById('loaderText').textContent = msg || 'Carregando...';
   document.getElementById('loader').classList.add('show');
@@ -770,9 +675,19 @@ function destruirCharts() {
   charts = {};
 }
 
-// ─────────────────────────────────────────────────────────────
-// PALETA DE CORES PARA GRÁFICOS
-// ─────────────────────────────────────────────────────────────
+// ================== NORMALIZAÇÃO ==================
+function normalizarRodovia(rod) {
+  if (!rod || rod === 'Nao identificada') return rod;
+  let r = rod.trim().toUpperCase();
+  if (/^(BR|AM)-\d{2,3}$/.test(r)) return r;
+  let match = r.match(/(BR|AM)[\s-]*(\d{2,3})/i);
+  if (match) {
+    return match[1].toUpperCase() + '-' + match[2];
+  }
+  return rod;
+}
+
+// ================== CORES ==================
 var PALETTE = [
   '#e8364f','#3b82f6','#10b981','#f59e0b','#8b5cf6',
   '#06b6d4','#ec4899','#84cc16','#f97316','#6366f1',
@@ -784,69 +699,49 @@ function cores(n) {
   return out;
 }
 
-// ─────────────────────────────────────────────────────────────
-// CARREGAR DADOS DO GOOGLE SHEETS (CSV público)
-// ─────────────────────────────────────────────────────────────
+// ================== CARREGAR DADOS ==================
 function carregarDados() {
   showLoader('Buscando dados da planilha...');
   document.getElementById('btnCarregar').disabled = true;
 
-  // URL de exportação CSV pública
-  var urlNoticias = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
-                    '/gviz/tq?tqx=out:csv&sheet=Noticias';
-  var urlDash     = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
-                    '/gviz/tq?tqx=out:csv&sheet=Dashboard_Dados';
-
-  Promise.all([
-    fetch(urlNoticias).then(function(r) {
+  fetch(CSV_URL)
+    .then(function(r) {
       if (!r.ok) throw new Error('Planilha não encontrada ou não está pública (status ' + r.status + ')');
       return r.text();
-    }),
-    fetch(urlDash).then(function(r) { return r.ok ? r.text() : ''; })
-  ])
-  .then(function(results) {
-    var csvNoticias  = results[0];
-    var csvDash      = results[1];
+    })
+    .then(function(csvText) {
+      todosRegistros = parseCSV(csvText);
+      if (todosRegistros.length === 0) {
+        throw new Error('Nenhuma notícia encontrada na aba "Noticias".');
+      }
+      todosRegistros.forEach(function(item) {
+        var campoRodovia = item['Rodovia'] || item['rodovia'] || '';
+        item['Rodovia'] = normalizarRodovia(campoRodovia);
+      });
 
-    var todos = parseCSV(csvNoticias);
-    var dashData = parseCSV(csvDash);
+      document.getElementById('statusText').textContent = 'Dados carregados';
+      document.getElementById('lastUpdate').textContent =
+        'Última carga: ' + new Date().toLocaleString('pt-BR');
 
-    if (todos.length === 0) {
-      throw new Error('Nenhuma notícia encontrada na aba "Noticias". Rode o script Python primeiro.');
-    }
+      renderKPIs();
+      renderCharts();
+      popularDropdownRodovias();
+      registrosFiltro = todosRegistros.slice();
+      renderTabela();
 
-    // Filtra para manter apenas notícias com Tipo de Via "Federal" ou "Estadual"
-    // (elimina "Nao identificada" que podem ser de outros estados)
-    todosRegistros = todos.filter(function(n) {
-      var tipoVia = (n['Tipo de Via'] || '').trim();
-      return tipoVia === 'Federal' || tipoVia === 'Estadual';
+      showAlert('✅ ' + todosRegistros.length + ' notícias carregadas!', 'success');
+    })
+    .catch(function(err) {
+      showAlert('❌ ' + err.message, 'error');
+      console.error(err);
+    })
+    .finally(function() {
+      hideLoader();
+      document.getElementById('btnCarregar').disabled = false;
     });
-
-    document.getElementById('statusText').textContent = 'Dados carregados';
-    document.getElementById('lastUpdate').textContent =
-      'Última carga: ' + new Date().toLocaleString('pt-BR');
-
-    renderKPIs(dashData, todosRegistros);
-    renderCharts(dashData, todosRegistros);
-    // Inicialmente, registrosFiltro = todosRegistros (sem filtros)
-    registrosFiltro = todosRegistros.slice();
-    renderTabela();
-
-    showAlert('✅ ' + todosRegistros.length + ' notícias carregadas (apenas rodovias AM/BR).', 'success');
-  })
-  .catch(function(err) {
-    showAlert('❌ ' + err.message, 'error');
-    console.error(err);
-  })
-  .finally(function() {
-    hideLoader();
-    document.getElementById('btnCarregar').disabled = false;
-  });
 }
 
-// ─────────────────────────────────────────────────────────────
-// PARSER CSV SIMPLES
-// ─────────────────────────────────────────────────────────────
+// ================== PARSER CSV ==================
 function parseCSV(csv) {
   if (!csv || !csv.trim()) return [];
   var lines   = csv.trim().split('\n');
@@ -857,7 +752,11 @@ function parseCSV(csv) {
     var vals = parseCSVLine(lines[i]);
     if (!vals.length || vals.every(function(v) { return !v; })) continue;
     var obj = {};
-    headers.forEach(function(h, idx) { obj[h] = vals[idx] || ''; });
+    headers.forEach(function(h, idx) {
+      var header = h.replace(/^"|"$/g, '').trim();
+      var value = (vals[idx] || '').replace(/^"|"$/g, '').trim();
+      obj[header] = value;
+    });
     rows.push(obj);
   }
   return rows;
@@ -871,60 +770,64 @@ function parseCSVLine(line) {
       if (inQuote && line[i+1] === '"') { current += '"'; i++; }
       else inQuote = !inQuote;
     } else if (ch === ',' && !inQuote) {
-      result.push(current.trim()); current = '';
+      result.push(current); current = '';
     } else {
       current += ch;
     }
   }
-  result.push(current.trim());
+  result.push(current);
   return result;
 }
 
-// ─────────────────────────────────────────────────────────────
-// KPIs (usam dados completos, não filtrados)
-// ─────────────────────────────────────────────────────────────
-function renderKPIs(dashData, noticias) {
-  var total     = noticias.length;
-  var rodovias  = 0, municipios = 0, fatais = 0;
-
-  dashData.forEach(function(row) {
-    var k = (row['=== TOTAIS ==='] || row['Rodovia'] || '').trim();
-    var v = parseInt(row['Total'] || row[''] || '0') || 0;
-    if (k === 'total_noticias')   total     = v;
-    if (k === 'total_rodovias')   rodovias  = v;
-    if (k === 'total_municipios') municipios = v;
-    if (k === 'total_fatais')     fatais    = v;
+// ================== DROPDOWN (APENAS IDENTIFICADAS) ==================
+function popularDropdownRodovias() {
+  var rodSet = new Set();
+  todosRegistros.forEach(function(n) {
+    var r = n['Rodovia'] || '';
+    if (r && r !== 'Nao identificada') rodSet.add(r);
+  });
+  var rodovias = Array.from(rodSet).sort(function(a,b) {
+    var aIsBR = a.startsWith('BR');
+    var bIsBR = b.startsWith('BR');
+    if (aIsBR && !bIsBR) return -1;
+    if (!aIsBR && bIsBR) return 1;
+    return a.localeCompare(b);
   });
 
-  // Fallback: calcula diretamente
-  if (!rodovias) {
-    var rs = new Set(noticias.map(function(n) { return n['Rodovia'] || n['rodovia']; })
-                             .filter(function(v) { return v && v !== 'Nao identificada'; }));
-    rodovias = rs.size;
-  }
-  if (!municipios) {
-    var ms = new Set(noticias.map(function(n) { return n['Municipio'] || n['Município']; })
-                             .filter(function(v) { return v && v !== 'Nao identificado'; }));
-    municipios = ms.size;
-  }
-  if (!fatais) {
-    fatais = noticias.filter(function(n) {
-      return (n['Tipo de Acidente/Sinistro'] || '').toLowerCase().includes('fatal');
-    }).length;
-  }
+  var select = document.getElementById('rodoviaSelect');
+  select.innerHTML = '<option value="">Todas as rodovias</option>';
+  rodovias.forEach(function(r) {
+    var opt = document.createElement('option');
+    opt.value = r;
+    opt.textContent = r;
+    select.appendChild(opt);
+  });
+}
+
+// ================== KPIs (EXCLUINDO NÃO IDENTIFICADOS) ==================
+function renderKPIs() {
+  var total = todosRegistros.length;
+  var rodSet = new Set(todosRegistros
+    .map(function(n) { return n['Rodovia']; })
+    .filter(function(v) { return v && v !== 'Nao identificada'; }));
+  var munSet = new Set(todosRegistros
+    .map(function(n) { return n['Município'] || n['Municipio']; })
+    .filter(function(v) { return v && v !== 'Nao identificado'; }));
+  var fatais = todosRegistros.filter(function(n) {
+    return (n['Tipo de Acidente/Sinistro'] || '').toLowerCase().includes('fatal');
+  }).length;
 
   document.getElementById('kpiTotal').textContent     = total.toLocaleString('pt-BR');
-  document.getElementById('kpiRodovias').textContent  = rodovias;
-  document.getElementById('kpiMunicipios').textContent = municipios;
+  document.getElementById('kpiRodovias').textContent  = rodSet.size;
+  document.getElementById('kpiMunicipios').textContent = munSet.size;
   document.getElementById('kpiFatais').textContent    = fatais;
 }
 
-// ─────────────────────────────────────────────────────────────
-// GRÁFICOS (usam dados completos, não filtrados)
-// ─────────────────────────────────────────────────────────────
+// ================== GRÁFICOS (EXCLUINDO NÃO IDENTIFICADOS) ==================
 var CHART_DEFAULTS = {
   plugins: {
-    legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } }
+    legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } },
+    tooltip: { backgroundColor: '#131629', titleColor: '#e2e8f0', bodyColor: '#94a3b8' }
   },
   scales: {
     x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
@@ -934,10 +837,11 @@ var CHART_DEFAULTS = {
   }
 };
 
-function contarPor(lista, campo) {
+function contarPor(lista, campo, excluirValores = []) {
   var cnt = {};
   lista.forEach(function(n) {
     var v = n[campo] || 'Não identificado';
+    if (excluirValores.includes(v)) return;
     cnt[v] = (cnt[v] || 0) + 1;
   });
   return cnt;
@@ -949,11 +853,11 @@ function topN(obj, n) {
     .slice(0, n);
 }
 
-function renderCharts(dashData, noticias) {
+function renderCharts() {
   destruirCharts();
 
-  // ── Rodovias ──
-  var cntRod  = contarPor(noticias, 'Rodovia');
+  // Rodovias
+  var cntRod  = contarPor(todosRegistros, 'Rodovia', ['Nao identificada']);
   var topRod  = topN(cntRod, 10);
   var labRod  = topRod.map(function(x) { return x[0]; });
   var valRod  = topRod.map(function(x) { return x[1]; });
@@ -962,22 +866,28 @@ function renderCharts(dashData, noticias) {
     type: 'bar',
     data: {
       labels: labRod,
-      datasets: [{ data: valRod, backgroundColor: cores(labRod.length),
-                   borderRadius: 5, borderSkipped: false }]
+      datasets: [{
+        data: valRod,
+        backgroundColor: cores(labRod.length),
+        borderRadius: 5,
+        borderSkipped: false,
+        barPercentage: 0.6
+      }]
     },
     options: Object.assign({}, CHART_DEFAULTS, {
       indexAxis: 'y',
       plugins: Object.assign({}, CHART_DEFAULTS.plugins, { legend: { display: false } }),
       scales: {
         x: CHART_DEFAULTS.scales.x,
-        y: Object.assign({}, CHART_DEFAULTS.scales.y,
-            { ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } } })
+        y: Object.assign({}, CHART_DEFAULTS.scales.y, {
+          ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+        })
       }
     })
   });
 
-  // ── Acidentes ──
-  var cntAc  = contarPor(noticias, 'Tipo de Acidente/Sinistro');
+  // Acidentes (mantém todos, mas pode adicionar exclusões se quiser)
+  var cntAc  = contarPor(todosRegistros, 'Tipo de Acidente/Sinistro', []);
   var topAc  = topN(cntAc, 8);
   var labAc  = topAc.map(function(x) { return x[0]; });
   var valAc  = topAc.map(function(x) { return x[1]; });
@@ -986,23 +896,29 @@ function renderCharts(dashData, noticias) {
     type: 'doughnut',
     data: {
       labels: labAc,
-      datasets: [{ data: valAc, backgroundColor: cores(labAc.length),
-                   borderWidth: 2, borderColor: '#07080f' }]
+      datasets: [{
+        data: valAc,
+        backgroundColor: cores(labAc.length),
+        borderWidth: 2,
+        borderColor: '#07080f',
+        hoverOffset: 8
+      }]
     },
     options: {
+      cutout: '65%',
       plugins: {
         legend: {
           position: 'right',
-          labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 },
-                    boxWidth: 12, padding: 10 }
-        }
+          labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 }, boxWidth: 12, padding: 10 }
+        },
+        tooltip: CHART_DEFAULTS.plugins.tooltip
       }
     }
   });
 
-  // ── Municípios ──
-  var cntMun = contarPor(noticias, 'Municipio');
-  var topMun = topN(cntMun, 8).filter(function(x) { return x[0] !== 'Nao identificado'; });
+  // Municípios
+  var cntMun = contarPor(todosRegistros, 'Município', ['Nao identificado']);
+  var topMun = topN(cntMun, 8);
   var labMun = topMun.map(function(x) { return x[0]; });
   var valMun = topMun.map(function(x) { return x[1]; });
 
@@ -1010,16 +926,21 @@ function renderCharts(dashData, noticias) {
     type: 'bar',
     data: {
       labels: labMun,
-      datasets: [{ data: valMun, backgroundColor: cores(labMun.length),
-                   borderRadius: 4, borderSkipped: false }]
+      datasets: [{
+        data: valMun,
+        backgroundColor: cores(labMun.length),
+        borderRadius: 4,
+        borderSkipped: false,
+        barPercentage: 0.6
+      }]
     },
     options: Object.assign({}, CHART_DEFAULTS, {
       plugins: Object.assign({}, CHART_DEFAULTS.plugins, { legend: { display: false } })
     })
   });
 
-  // ── Tipo de Via ──
-  var cntVia  = contarPor(noticias, 'Tipo de Via');
+  // Tipo de Via
+  var cntVia  = contarPor(todosRegistros, 'Tipo de Via', ['Nao identificada']);
   var labVia  = Object.keys(cntVia);
   var valVia  = Object.values(cntVia);
   var coresVia = labVia.map(function(v) {
@@ -1032,19 +953,24 @@ function renderCharts(dashData, noticias) {
     type: 'pie',
     data: {
       labels: labVia,
-      datasets: [{ data: valVia, backgroundColor: coresVia,
-                   borderWidth: 2, borderColor: '#07080f' }]
+      datasets: [{
+        data: valVia,
+        backgroundColor: coresVia,
+        borderWidth: 2,
+        borderColor: '#07080f'
+      }]
     },
     options: {
       plugins: {
-        legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } }
+        legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } },
+        tooltip: CHART_DEFAULTS.plugins.tooltip
       }
     }
   });
 
-  // ── Evolução Mensal ──
+  // Evolução Mensal
   var meses = {};
-  noticias.forEach(function(n) {
+  todosRegistros.forEach(function(n) {
     var d = n['Data/Hora'] || '';
     var m = d.substring(3, 10); // MM/YYYY
     if (m && m.length === 7) meses[m] = (meses[m] || 0) + 1;
@@ -1068,6 +994,7 @@ function renderCharts(dashData, noticias) {
         pointBackgroundColor: '#e8364f',
         pointRadius: 4,
         pointHoverRadius: 6,
+        borderWidth: 2
       }]
     },
     options: Object.assign({}, CHART_DEFAULTS, {
@@ -1076,46 +1003,7 @@ function renderCharts(dashData, noticias) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-// APLICAR FILTROS (chamado pelo botão Pesquisar)
-// ─────────────────────────────────────────────────────────────
-function aplicarFiltros() {
-  var q = document.getElementById('searchInput').value.toLowerCase();
-  var rodoviaSel = document.getElementById('rodoviaSelect').value;
-
-  registrosFiltro = todosRegistros.filter(function(n) {
-    // Filtro de busca geral
-    var matchGeral = (n['Título']||'').toLowerCase().includes(q) ||
-                     (n['Rodovia']||'').toLowerCase().includes(q) ||
-                     (n['Municipio']||'').toLowerCase().includes(q) ||
-                     (n['Fonte']||'').toLowerCase().includes(q) ||
-                     (n['Tipo de Via']||'').toLowerCase().includes(q);
-
-    if (!matchGeral) return false;
-
-    // Filtro de rodovia específica
-    if (rodoviaSel !== '') {
-      var rodoviaNoticia = (n['Rodovia'] || '').toUpperCase();
-      return rodoviaNoticia.includes(rodoviaSel.toUpperCase());
-    }
-    return true;
-  });
-
-  paginaAtual = 1;
-  renderTabela();
-}
-
-function limparFiltros() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('rodoviaSelect').value = '';
-  registrosFiltro = todosRegistros.slice();
-  paginaAtual = 1;
-  renderTabela();
-}
-
-// ─────────────────────────────────────────────────────────────
-// RENDERIZAR TABELA (com paginação)
-// ─────────────────────────────────────────────────────────────
+// ================== TABELA E FILTROS ==================
 function badgeVia(v) {
   if (!v) return '<span class="badge badge-ni">—</span>';
   if (v === 'Federal')  return '<span class="badge badge-federal">Federal</span>';
@@ -1126,6 +1014,30 @@ function badgeTipo(v) {
   if (!v) return '<span class="badge badge-geral">—</span>';
   if (v.includes('Fatal')) return '<span class="badge badge-fatal">' + v + '</span>';
   return '<span class="badge badge-geral">' + v + '</span>';
+}
+
+function aplicarFiltros() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var rodoviaSel = document.getElementById('rodoviaSelect').value;
+
+  registrosFiltro = todosRegistros.filter(function(n) {
+    var matchGeral = (n['Título']||'').toLowerCase().includes(q) ||
+                     (n['Rodovia']||'').toLowerCase().includes(q) ||
+                     (n['Município']||n['Municipio']||'').toLowerCase().includes(q) ||
+                     (n['Fonte']||'').toLowerCase().includes(q) ||
+                     (n['Tipo de Via']||'').toLowerCase().includes(q);
+
+    if (!matchGeral) return false;
+
+    if (rodoviaSel !== '') {
+      var rodoviaNoticia = (n['Rodovia'] || '').toUpperCase();
+      return rodoviaNoticia.includes(rodoviaSel.toUpperCase());
+    }
+    return true;
+  });
+
+  paginaAtual = 1;
+  renderTabela();
 }
 
 function renderTabela() {
@@ -1156,13 +1068,12 @@ function renderTabela() {
       '<td style="white-space:nowrap;font-size:11px;color:var(--muted)">' + (n['Fonte']||'—') + '</td>' +
       '<td>' + badgeVia(n['Tipo de Via']) + '</td>' +
       '<td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--acc2)">' + (n['Rodovia']||'—') + '</td>' +
-      '<td style="font-size:11px">' + (n['Municipio']||'—') + '</td>' +
+      '<td style="font-size:11px">' + (n['Município']||n['Municipio']||'—') + '</td>' +
       '<td>' + badgeTipo(n['Tipo de Acidente/Sinistro']) + '</td>' +
       '<td><a href="' + (n['Link']||'#') + '" target="_blank" rel="noopener">↗ abrir</a></td>' +
     '</tr>';
   }).join('');
 
-  // Paginação
   var totalPags = Math.ceil(total / itensPorPagina);
   document.getElementById('pageInfo').textContent =
     'Página ' + paginaAtual + ' de ' + totalPags +
@@ -1192,9 +1103,7 @@ function irPagina(p) {
   document.querySelector('.table-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ─────────────────────────────────────────────────────────────
-// EXPORTAR CSV
-// ─────────────────────────────────────────────────────────────
+// ================== EXPORTAR CSV ==================
 function exportarCSV() {
   if (!registrosFiltro.length) {
     showAlert('Carregue os dados primeiro.', 'error'); return;
@@ -1213,13 +1122,10 @@ function exportarCSV() {
   a.click();
 }
 
-// ─────────────────────────────────────────────────────────────
-// INICIALIZAÇÃO (carrega dados automaticamente ao abrir a página)
-// ─────────────────────────────────────────────────────────────
-(function init() {
-  // Carrega os dados assim que a página for aberta
+// ================== INICIALIZAÇÃO ==================
+window.addEventListener('load', function() {
   carregarDados();
-})();
+});
 </script>
 </body>
 </html>
