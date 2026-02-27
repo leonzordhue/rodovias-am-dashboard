@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observatório de Sinistros — Rodovias do Amazonas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:       #07080f;
+    --bg2:      #0d0f1c;
+    --bg3:      #131629;
+    --border:   #1e2240;
+    --acc:      #e8364f;
+    --acc2:     #ff6b35;
+    --acc3:     #3b82f6;
+    --gold:     #f59e0b;
+    --green:    #10b981;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --card-bg:  #0f1120;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* GRID BACKGROUND */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(232,54,79,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,54,79,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    padding: 32px 48px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(232,54,79,0.05) 0%, transparent 100%);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .logo-area {}
+  .logo-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--acc);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: clamp(22px, 3vw, 36px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  h1 span { color: var(--acc); }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  .last-update {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* CONTROLES */
+  .controls {
+    position: relative; z-index: 10;
+    padding: 20px 48px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    border: none; border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--acc);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #c0253c; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--bg3);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--acc); color: var(--acc); }
+
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .config-input {
+    flex: 1; min-width: 280px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+  }
+  .config-input label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .config-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* NOVO: estilo para o dropdown de rodovias */
+  .filter-select {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+  }
+  .filter-select:hover {
+    border-color: var(--acc);
+  }
+  .filter-select optgroup {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .filter-select option {
+    background: var(--bg3);
+    color: var(--text);
+  }
+
+  /* ALERT */
+  .alert {
+    position: relative; z-index: 10;
+    margin: 16px 48px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+  .alert.error   { background: rgba(232,54,79,0.1); border: 1px solid rgba(232,54,79,0.4); color: #fca5a5; }
+  .alert.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.4); color: #6ee7b7; }
+  .alert.info    { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.4); color: #93c5fd; }
+  .alert.show    { display: block; }
+
+  /* MAIN */
+  main {
+    position: relative; z-index: 10;
+    padding: 32px 48px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* KPIs */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--acc); transform: translateY(-2px); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--acc), transparent);
+  }
+
+  .kpi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .kpi-value {
+    font-size: 38px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .kpi-icon {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-size: 28px;
+    opacity: 0.15;
+  }
+
+  /* CHARTS GRID */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .charts-grid.triple {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media (max-width: 900px) {
+    .charts-grid, .charts-grid.triple {
+      grid-template-columns: 1fr;
+    }
+    header, .controls, main { padding-left: 20px; padding-right: 20px; }
+    .alert { margin-left: 20px; margin-right: 20px; }
+  }
+
+  .chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .chart-card:hover { border-color: #2a2f55; }
+  .chart-card.full  { grid-column: 1 / -1; }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .chart-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 280px;
+  }
+  .chart-wrap.tall { height: 340px; }
+
+  /* TABELA */
+  .table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .table-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .table-header-left {}
+
+  .search-wrap {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+  }
+  .search-wrap input {
+    background: transparent;
+    border: none; outline: none;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    width: 220px;
+  }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  .table-wrap { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #0a0c18; }
+  th {
+    padding: 12px 16px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(30,34,64,0.5);
+    vertical-align: top;
+    max-width: 300px;
+  }
+  tr:hover td { background: rgba(232,54,79,0.03); }
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-federal  { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+  .badge-estadual { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+  .badge-ni       { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+  .badge-fatal    { background: rgba(232,54,79,0.15); color: #fca5a5; border: 1px solid rgba(232,54,79,0.3); }
+  .badge-geral    { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+
+  td a {
+    color: var(--acc3);
+    text-decoration: none;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  td a:hover { text-decoration: underline; }
+
+  /* PAGINAÇÃO */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .page-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .page-btns { display: flex; gap: 8px; }
+  .page-btn {
+    padding: 6px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    transition: all 0.15s;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--acc); color: var(--acc); }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .page-btn.active { background: var(--acc); border-color: var(--acc); color: #fff; }
+
+  /* LOADER */
+  .loader-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(7,8,15,0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .loader-overlay.show { display: flex; }
+  .loader-ring {
+    width: 56px; height: 56px;
+    border: 3px solid var(--border);
+    border-top-color: var(--acc);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+  .empty-title { font-size: 16px; color: var(--muted); margin-bottom: 8px; }
+  .empty-sub { font-size: 12px; color: var(--muted); opacity: 0.6; font-family: 'JetBrains Mono', monospace; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 10;
+    padding: 24px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--acc);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <div class="loader-ring"></div>
+  <div class="loader-text" id="loaderText">Carregando dados...</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <div class="logo-area">
+      <div class="logo-tag">// Observatório de Sinistros</div>
+      <h1>Rodovias do <span>Amazonas</span></h1>
+      <div class="subtitle">Monitoramento contínuo · Google News RSS · Atualização diária</div>
+    </div>
+    <div class="header-status">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span id="statusText">Aguardando dados</span>
+      </div>
+      <div class="last-update" id="lastUpdate">—</div>
+    </div>
+  </div>
+</header>
+
+<!-- CONTROLES -->
+<div class="controls">
+  <div class="config-input">
+    <label>SHEETS ID:</label>
+    <input type="text" id="sheetId" placeholder="Cole o ID da sua planilha aqui"
+           value="">
+  </div>
+  <button class="btn btn-primary" id="btnCarregar" onclick="carregarDados()">
+    ▶ Carregar Dados
+  </button>
+  <button class="btn btn-secondary" onclick="exportarCSV()">
+    ↓ Exportar CSV
+  </button>
+  <button class="btn btn-secondary" onclick="window.location.reload()">
+    ↺ Recarregar
+  </button>
+</div>
+
+<!-- LINHA DE FILTROS (BUSCA + SELETOR DE RODOVIA) -->
+<div class="controls" style="border-top: none; padding-top: 0; padding-bottom: 20px;">
+  <div class="search-wrap" style="flex:2;">
+    <span style="color:var(--muted);font-size:13px">🔍</span>
+    <input type="text" id="searchInput" placeholder="Filtrar por título, rodovia, município, fonte..." oninput="filtrarTabela()">
+  </div>
+
+  <!-- DROPDOWN DE RODOVIAS (LISTA FORNECIDA) -->
+  <select class="filter-select" id="rodoviaSelect" onchange="filtrarTabela()">
+    <option value="">Todas as rodovias</option>
+    <optgroup label="🛣️  Rodovias Estaduais (AM)">
+      <option value="AM-010">AM-010</option>
+      <option value="AM-020">AM-020</option>
+      <option value="AM-070">AM-070</option>
+      <option value="AM-151">AM-151</option>
+      <option value="AM-170">AM-170</option>
+      <option value="AM-175">AM-175</option>
+      <option value="AM-239">AM-239</option>
+      <option value="AM-240">AM-240</option>
+      <option value="AM-249">AM-249</option>
+      <option value="AM-254">AM-254</option>
+      <option value="AM-280">AM-280</option>
+      <option value="AM-326">AM-326</option>
+      <option value="AM-328">AM-328</option>
+      <option value="AM-329">AM-329</option>
+      <option value="AM-330">AM-330</option>
+      <option value="AM-336">AM-336</option>
+      <option value="AM-343">AM-343</option>
+      <option value="AM-351">AM-351</option>
+      <option value="AM-352">AM-352</option>
+      <option value="AM-354">AM-354</option>
+      <option value="AM-356">AM-356</option>
+      <option value="AM-360">AM-360</option>
+      <option value="AM-362">AM-362</option>
+      <option value="AM-363">AM-363</option>
+      <option value="AM-364">AM-364</option>
+      <option value="AM-366">AM-366</option>
+      <option value="AM-374">AM-374</option>
+      <option value="AM-378">AM-378</option>
+      <option value="AM-449">AM-449</option>
+      <option value="AM-450">AM-450</option>
+      <option value="AM-451">AM-451</option>
+      <option value="AM-452">AM-452</option>
+      <option value="AM-453">AM-453</option>
+      <option value="AM-466">AM-466</option>
+    </optgroup>
+    <optgroup label="🛣️  Rodovias Federais (BR)">
+      <option value="BR-174">BR-174</option>
+      <option value="BR-319">BR-319</option>
+      <option value="BR-230">BR-230</option>
+      <option value="BR-317">BR-317</option>
+      <option value="BR-307">BR-307</option>
+      <option value="BR-411">BR-411</option>
+      <option value="BR-413">BR-413</option>
+    </optgroup>
+  </select>
+</div>
+
+<!-- ALERT -->
+<div class="alert" id="alert"></div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- KPIs -->
+  <div class="section-title">indicadores gerais</div>
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Notícias</div>
+      <div class="kpi-value" id="kpiTotal">—</div>
+      <div class="kpi-sub">registros coletados</div>
+      <div class="kpi-icon">📰</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Rodovias Monitoradas</div>
+      <div class="kpi-value" id="kpiRodovias">—</div>
+      <div class="kpi-sub">identificadas automaticamente</div>
+      <div class="kpi-icon">🛣️</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Municípios Afetados</div>
+      <div class="kpi-value" id="kpiMunicipios">—</div>
+      <div class="kpi-sub">no estado do Amazonas</div>
+      <div class="kpi-icon">📍</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ocorrências Fatais</div>
+      <div class="kpi-value" id="kpiFatais" style="color:var(--acc)">—</div>
+      <div class="kpi-sub">acidentes com vítimas fatais</div>
+      <div class="kpi-icon">⚠️</div>
+    </div>
+  </div>
+
+  <!-- GRÁFICOS LINHA 1 -->
+  <div class="section-title">distribuição por categoria</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Rodovias com Mais Ocorrências</div>
+      <div class="chart-sub">top 10 · por número de notícias</div>
+      <div class="chart-wrap">
+        <canvas id="chartRodovias"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Tipo de Acidente / Sinistro</div>
+      <div class="chart-sub">classificação automática por palavras-chave</div>
+      <div class="chart-wrap">
+        <canvas id="chartAcidentes"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRÁFICOS LINHA 2 -->
+  <div class="charts-grid triple">
+    <div class="chart-card">
+      <div class="chart-title">Municípios com Mais Ocorrências</div>
+      <div class="chart-sub">top 8 municípios do AM</div>
+      <div class="chart-wrap">
+        <canvas id="chartMunicipios"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Tipo de Via</div>
+      <div class="chart-sub">federal vs estadual</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartVia"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Evolução Mensal</div>
+      <div class="chart-sub">volume de notícias ao longo do tempo</div>
+      <div class="chart-wrap">
+        <canvas id="chartMensal"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABELA -->
+  <div class="section-title">notícias coletadas</div>
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <div class="chart-title">Todas as Notícias</div>
+        <div class="chart-sub" id="tableInfo">—</div>
+      </div>
+      <!-- Os filtros estão na linha superior, apenas repetimos a info -->
+    </div>
+    <div class="table-wrap">
+      <table id="tabelaNoticias">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Data</th>
+            <th>Título</th>
+            <th>Fonte</th>
+            <th>Via</th>
+            <th>Rodovia</th>
+            <th>Município</th>
+            <th>Tipo</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody">
+          <tr><td colspan="9">
+            <div class="empty-state">
+              <div class="empty-icon">📡</div>
+              <div class="empty-title">Aguardando dados</div>
+              <div class="empty-sub">Insira o ID da planilha e clique em "Carregar Dados"</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginacao" style="display:none">
+      <div class="page-info" id="pageInfo"></div>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-text">Observatório de Sinistros — Rodovias do Amazonas</div>
+  <div class="footer-text">Fonte: Google News RSS · Dados via Google Sheets API (público)</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// ESTADO GLOBAL
+// ─────────────────────────────────────────────────────────────
+var todosRegistros  = [];
+var registrosFiltro = [];
+var paginaAtual     = 1;
+var itensPorPagina  = 25;
+var charts          = {};
+
+// ─────────────────────────────────────────────────────────────
+// UTILITÁRIOS
+// ─────────────────────────────────────────────────────────────
+function showLoader(msg) {
+  document.getElementById('loaderText').textContent = msg || 'Carregando...';
+  document.getElementById('loader').classList.add('show');
+}
+function hideLoader() {
+  document.getElementById('loader').classList.remove('show');
+}
+function showAlert(msg, tipo) {
+  var el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className   = 'alert ' + tipo + ' show';
+  setTimeout(function() { el.classList.remove('show'); }, 6000);
+}
+function destruirCharts() {
+  Object.values(charts).forEach(function(c) { if (c) c.destroy(); });
+  charts = {};
+}
+
+// ─────────────────────────────────────────────────────────────
+// PALETA DE CORES PARA GRÁFICOS
+// ─────────────────────────────────────────────────────────────
+var PALETTE = [
+  '#e8364f','#3b82f6','#10b981','#f59e0b','#8b5cf6',
+  '#06b6d4','#ec4899','#84cc16','#f97316','#6366f1',
+  '#14b8a6','#ef4444','#a855f7','#22c55e','#0ea5e5'
+];
+function cores(n) {
+  var out = [];
+  for (var i = 0; i < n; i++) out.push(PALETTE[i % PALETTE.length]);
+  return out;
+}
+
+// ─────────────────────────────────────────────────────────────
+// CARREGAR DADOS DO GOOGLE SHEETS (CSV público)
+// ─────────────────────────────────────────────────────────────
+function carregarDados() {
+  var id = document.getElementById('sheetId').value.trim();
+  if (!id || id === 'COLE_O_ID_DA_SUA_PLANILHA_AQUI') {
+    showAlert('⚠️  Cole o ID da sua planilha Google Sheets no campo acima.', 'error');
+    return;
+  }
+
+  // Salva ID localmente
+  try { localStorage.setItem('sheetId', id); } catch(e) {}
+
+  showLoader('Buscando dados da planilha...');
+  document.getElementById('btnCarregar').disabled = true;
+
+  // URL de exportação CSV pública (planilha precisa estar compartilhada como "qualquer um pode ver")
+  var urlNoticias = 'https://docs.google.com/spreadsheets/d/' + id +
+                    '/gviz/tq?tqx=out:csv&sheet=Noticias';
+  var urlDash     = 'https://docs.google.com/spreadsheets/d/' + id +
+                    '/gviz/tq?tqx=out:csv&sheet=Dashboard_Dados';
+
+  Promise.all([
+    fetch(urlNoticias).then(function(r) {
+      if (!r.ok) throw new Error('Planilha não encontrada ou não está pública (status ' + r.status + ')');
+      return r.text();
+    }),
+    fetch(urlDash).then(function(r) { return r.ok ? r.text() : ''; })
+  ])
+  .then(function(results) {
+    var csvNoticias  = results[0];
+    var csvDash      = results[1];
+
+    todosRegistros   = parseCSV(csvNoticias);
+    var dashData     = parseCSV(csvDash);
+
+    if (todosRegistros.length === 0) {
+      throw new Error('Nenhuma notícia encontrada na aba "Noticias". Rode o script Python primeiro.');
+    }
+
+    document.getElementById('statusText').textContent = 'Dados carregados';
+    document.getElementById('lastUpdate').textContent =
+      'Última carga: ' + new Date().toLocaleString('pt-BR');
+
+    renderKPIs(dashData, todosRegistros);
+    renderCharts(dashData, todosRegistros);
+    registrosFiltro = todosRegistros.slice();
+    renderTabela();
+
+    showAlert('✅ ' + todosRegistros.length + ' notícias carregadas com sucesso!', 'success');
+  })
+  .catch(function(err) {
+    showAlert('❌ ' + err.message, 'error');
+    console.error(err);
+  })
+  .finally(function() {
+    hideLoader();
+    document.getElementById('btnCarregar').disabled = false;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// PARSER CSV SIMPLES
+// ─────────────────────────────────────────────────────────────
+function parseCSV(csv) {
+  if (!csv || !csv.trim()) return [];
+  var lines   = csv.trim().split('\n');
+  if (lines.length < 2) return [];
+  var headers = parseCSVLine(lines[0]);
+  var rows    = [];
+  for (var i = 1; i < lines.length; i++) {
+    var vals = parseCSVLine(lines[i]);
+    if (!vals.length || vals.every(function(v) { return !v; })) continue;
+    var obj = {};
+    headers.forEach(function(h, idx) { obj[h] = vals[idx] || ''; });
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function parseCSVLine(line) {
+  var result = [], current = '', inQuote = false;
+  for (var i = 0; i < line.length; i++) {
+    var ch = line[i];
+    if (ch === '"') {
+      if (inQuote && line[i+1] === '"') { current += '"'; i++; }
+      else inQuote = !inQuote;
+    } else if (ch === ',' && !inQuote) {
+      result.push(current.trim()); current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+// ─────────────────────────────────────────────────────────────
+// KPIs (usam dados completos, não filtrados)
+// ─────────────────────────────────────────────────────────────
+function renderKPIs(dashData, noticias) {
+  // Tenta pegar dos dados do dashboard primeiro
+  var total     = noticias.length;
+  var rodovias  = 0, municipios = 0, fatais = 0;
+
+  dashData.forEach(function(row) {
+    var k = (row['=== TOTAIS ==='] || row['Rodovia'] || '').trim();
+    var v = parseInt(row['Total'] || row[''] || '0') || 0;
+    if (k === 'total_noticias')   total     = v;
+    if (k === 'total_rodovias')   rodovias  = v;
+    if (k === 'total_municipios') municipios = v;
+    if (k === 'total_fatais')     fatais    = v;
+  });
+
+  // Fallback: calcula diretamente
+  if (!rodovias) {
+    var rs = new Set(noticias.map(function(n) { return n['Rodovia'] || n['rodovia']; })
+                             .filter(function(v) { return v && v !== 'Nao identificada'; }));
+    rodovias = rs.size;
+  }
+  if (!municipios) {
+    var ms = new Set(noticias.map(function(n) { return n['Municipio'] || n['Município']; })
+                             .filter(function(v) { return v && v !== 'Nao identificado'; }));
+    municipios = ms.size;
+  }
+  if (!fatais) {
+    fatais = noticias.filter(function(n) {
+      return (n['Tipo de Acidente/Sinistro'] || '').toLowerCase().includes('fatal');
+    }).length;
+  }
+
+  document.getElementById('kpiTotal').textContent     = total.toLocaleString('pt-BR');
+  document.getElementById('kpiRodovias').textContent  = rodovias;
+  document.getElementById('kpiMunicipios').textContent = municipios;
+  document.getElementById('kpiFatais').textContent    = fatais;
+}
+
+// ─────────────────────────────────────────────────────────────
+// GRÁFICOS (usam dados completos, não filtrados)
+// ─────────────────────────────────────────────────────────────
+var CHART_DEFAULTS = {
+  plugins: {
+    legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } }
+  },
+  scales: {
+    x: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
+         grid: { color: '#1e2240' } },
+    y: { ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } },
+         grid: { color: '#1e2240' } }
+  }
+};
+
+function contarPor(lista, campo) {
+  var cnt = {};
+  lista.forEach(function(n) {
+    var v = n[campo] || 'Não identificado';
+    cnt[v] = (cnt[v] || 0) + 1;
+  });
+  return cnt;
+}
+
+function topN(obj, n) {
+  return Object.entries(obj)
+    .sort(function(a,b) { return b[1]-a[1]; })
+    .slice(0, n);
+}
+
+function renderCharts(dashData, noticias) {
+  destruirCharts();
+
+  // ── Rodovias ──
+  var cntRod  = contarPor(noticias, 'Rodovia');
+  var topRod  = topN(cntRod, 10);
+  var labRod  = topRod.map(function(x) { return x[0]; });
+  var valRod  = topRod.map(function(x) { return x[1]; });
+
+  charts.rodovias = new Chart(document.getElementById('chartRodovias'), {
+    type: 'bar',
+    data: {
+      labels: labRod,
+      datasets: [{ data: valRod, backgroundColor: cores(labRod.length),
+                   borderRadius: 5, borderSkipped: false }]
+    },
+    options: Object.assign({}, CHART_DEFAULTS, {
+      indexAxis: 'y',
+      plugins: Object.assign({}, CHART_DEFAULTS.plugins, { legend: { display: false } }),
+      scales: {
+        x: CHART_DEFAULTS.scales.x,
+        y: Object.assign({}, CHART_DEFAULTS.scales.y,
+            { ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } } })
+      }
+    })
+  });
+
+  // ── Acidentes ──
+  var cntAc  = contarPor(noticias, 'Tipo de Acidente/Sinistro');
+  var topAc  = topN(cntAc, 8);
+  var labAc  = topAc.map(function(x) { return x[0]; });
+  var valAc  = topAc.map(function(x) { return x[1]; });
+
+  charts.acidentes = new Chart(document.getElementById('chartAcidentes'), {
+    type: 'doughnut',
+    data: {
+      labels: labAc,
+      datasets: [{ data: valAc, backgroundColor: cores(labAc.length),
+                   borderWidth: 2, borderColor: '#07080f' }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 },
+                    boxWidth: 12, padding: 10 }
+        }
+      }
+    }
+  });
+
+  // ── Municípios ──
+  var cntMun = contarPor(noticias, 'Municipio');
+  var topMun = topN(cntMun, 8).filter(function(x) { return x[0] !== 'Nao identificado'; });
+  var labMun = topMun.map(function(x) { return x[0]; });
+  var valMun = topMun.map(function(x) { return x[1]; });
+
+  charts.municipios = new Chart(document.getElementById('chartMunicipios'), {
+    type: 'bar',
+    data: {
+      labels: labMun,
+      datasets: [{ data: valMun, backgroundColor: cores(labMun.length),
+                   borderRadius: 4, borderSkipped: false }]
+    },
+    options: Object.assign({}, CHART_DEFAULTS, {
+      plugins: Object.assign({}, CHART_DEFAULTS.plugins, { legend: { display: false } })
+    })
+  });
+
+  // ── Tipo de Via ──
+  var cntVia  = contarPor(noticias, 'Tipo de Via');
+  var labVia  = Object.keys(cntVia);
+  var valVia  = Object.values(cntVia);
+  var coresVia = labVia.map(function(v) {
+    if (v === 'Federal')  return '#10b981';
+    if (v === 'Estadual') return '#3b82f6';
+    return '#64748b';
+  });
+
+  charts.via = new Chart(document.getElementById('chartVia'), {
+    type: 'pie',
+    data: {
+      labels: labVia,
+      datasets: [{ data: valVia, backgroundColor: coresVia,
+                   borderWidth: 2, borderColor: '#07080f' }]
+    },
+    options: {
+      plugins: {
+        legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } }
+      }
+    }
+  });
+
+  // ── Evolução Mensal ──
+  var meses = {};
+  noticias.forEach(function(n) {
+    var d = n['Data/Hora'] || '';
+    var m = d.substring(3, 10); // MM/YYYY
+    if (m && m.length === 7) meses[m] = (meses[m] || 0) + 1;
+  });
+  var labMes = Object.keys(meses).sort(function(a,b) {
+    var pa = a.split('/'), pb = b.split('/');
+    return (pa[1]+pa[0]) > (pb[1]+pb[0]) ? 1 : -1;
+  });
+  var valMes = labMes.map(function(m) { return meses[m]; });
+
+  charts.mensal = new Chart(document.getElementById('chartMensal'), {
+    type: 'line',
+    data: {
+      labels: labMes,
+      datasets: [{
+        data: valMes,
+        borderColor: '#e8364f',
+        backgroundColor: 'rgba(232,54,79,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#e8364f',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: Object.assign({}, CHART_DEFAULTS, {
+      plugins: Object.assign({}, CHART_DEFAULTS.plugins, { legend: { display: false } })
+    })
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// TABELA + FILTROS
+// ─────────────────────────────────────────────────────────────
+function badgeVia(v) {
+  if (!v) return '<span class="badge badge-ni">—</span>';
+  if (v === 'Federal')  return '<span class="badge badge-federal">Federal</span>';
+  if (v === 'Estadual') return '<span class="badge badge-estadual">Estadual</span>';
+  return '<span class="badge badge-ni">N/I</span>';
+}
+function badgeTipo(v) {
+  if (!v) return '<span class="badge badge-geral">—</span>';
+  if (v.includes('Fatal')) return '<span class="badge badge-fatal">' + v + '</span>';
+  return '<span class="badge badge-geral">' + v + '</span>';
+}
+
+function filtrarTabela() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var rodoviaSel = document.getElementById('rodoviaSelect').value; // pode ser vazio (todas)
+
+  registrosFiltro = todosRegistros.filter(function(n) {
+    // Filtro de busca geral
+    var matchGeral = (n['Título']||'').toLowerCase().includes(q) ||
+                     (n['Rodovia']||'').toLowerCase().includes(q) ||
+                     (n['Municipio']||'').toLowerCase().includes(q) ||
+                     (n['Fonte']||'').toLowerCase().includes(q) ||
+                     (n['Tipo de Via']||'').toLowerCase().includes(q);
+
+    if (!matchGeral) return false;
+
+    // Filtro de rodovia específica
+    if (rodoviaSel !== '') {
+      var rodoviaNoticia = (n['Rodovia'] || '').toUpperCase();
+      // Verifica se a rodovia selecionada aparece como parte do campo (ex: "BR-174 / AM-070")
+      return rodoviaNoticia.includes(rodoviaSel.toUpperCase());
+    }
+    return true;
+  });
+
+  paginaAtual = 1;
+  renderTabela();
+}
+
+function renderTabela() {
+  var total  = registrosFiltro.length;
+  var inicio = (paginaAtual - 1) * itensPorPagina;
+  var fim    = Math.min(inicio + itensPorPagina, total);
+  var pagina = registrosFiltro.slice(inicio, fim);
+
+  document.getElementById('tableInfo').textContent =
+    total.toLocaleString('pt-BR') + ' notícias' + (total !== todosRegistros.length ? ' (filtradas)' : '');
+
+  var tbody = document.getElementById('tabelaBody');
+  if (!pagina.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">' +
+      '<div class="empty-icon">🔍</div>' +
+      '<div class="empty-title">Nenhuma notícia encontrada</div>' +
+      '<div class="empty-sub">Tente outros termos de busca ou selecione outra rodovia</div></div></td></tr>';
+    document.getElementById('paginacao').style.display = 'none';
+    return;
+  }
+
+  tbody.innerHTML = pagina.map(function(n) {
+    var titulo = (n['Título'] || '—').substring(0, 80) + (n['Título']&&n['Título'].length>80?'...':'');
+    return '<tr>' +
+      '<td style="color:var(--muted);font-family:JetBrains Mono,monospace;font-size:10px">' + (n['ID']||'') + '</td>' +
+      '<td style="white-space:nowrap;font-family:JetBrains Mono,monospace;font-size:10px;color:var(--muted)">' + (n['Data/Hora']||'—') + '</td>' +
+      '<td style="min-width:200px">' + titulo + '</td>' +
+      '<td style="white-space:nowrap;font-size:11px;color:var(--muted)">' + (n['Fonte']||'—') + '</td>' +
+      '<td>' + badgeVia(n['Tipo de Via']) + '</td>' +
+      '<td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--acc2)">' + (n['Rodovia']||'—') + '</td>' +
+      '<td style="font-size:11px">' + (n['Municipio']||'—') + '</td>' +
+      '<td>' + badgeTipo(n['Tipo de Acidente/Sinistro']) + '</td>' +
+      '<td><a href="' + (n['Link']||'#') + '" target="_blank" rel="noopener">↗ abrir</a></td>' +
+    '</tr>';
+  }).join('');
+
+  // Paginação
+  var totalPags = Math.ceil(total / itensPorPagina);
+  document.getElementById('pageInfo').textContent =
+    'Página ' + paginaAtual + ' de ' + totalPags +
+    ' (' + (inicio+1) + '–' + fim + ' de ' + total + ')';
+
+  var btns = '';
+  btns += '<button class="page-btn" onclick="irPagina(' + (paginaAtual-1) + ')" ' +
+          (paginaAtual <= 1 ? 'disabled' : '') + '>← Anterior</button>';
+
+  var de = Math.max(1, paginaAtual-2), ate = Math.min(totalPags, paginaAtual+2);
+  for (var p = de; p <= ate; p++) {
+    btns += '<button class="page-btn ' + (p===paginaAtual?'active':'') +
+            '" onclick="irPagina(' + p + ')">' + p + '</button>';
+  }
+  btns += '<button class="page-btn" onclick="irPagina(' + (paginaAtual+1) + ')" ' +
+          (paginaAtual >= totalPags ? 'disabled' : '') + '>Próxima →</button>';
+
+  document.getElementById('pageBtns').innerHTML = btns;
+  document.getElementById('paginacao').style.display = 'flex';
+}
+
+function irPagina(p) {
+  var total = Math.ceil(registrosFiltro.length / itensPorPagina);
+  if (p < 1 || p > total) return;
+  paginaAtual = p;
+  renderTabela();
+  document.querySelector('.table-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORTAR CSV
+// ─────────────────────────────────────────────────────────────
+function exportarCSV() {
+  if (!registrosFiltro.length) {
+    showAlert('Carregue os dados primeiro.', 'error'); return;
+  }
+  var cols = Object.keys(registrosFiltro[0]);
+  var csv  = cols.join(',') + '\n';
+  registrosFiltro.forEach(function(n) {
+    csv += cols.map(function(c) {
+      return '"' + (n[c]||'').toString().replace(/"/g,'""') + '"';
+    }).join(',') + '\n';
+  });
+  var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  var a    = document.createElement('a');
+  a.href   = URL.createObjectURL(blob);
+  a.download = 'rodovias_am_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+(function init() {
+  try {
+    var saved = localStorage.getItem('sheetId');
+    if (saved) document.getElementById('sheetId').value = saved;
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
