@@ -386,7 +386,103 @@
 </footer>
 
 <script>
-// ================== CONFIGURAÇÃO ==================
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  AKE — AXIOMATIC KERNEL ENGINE · UNIFIED FIELD THEORY                       ║
+// ║  Protocolo: UFT-1.0 · Perfil Dependente · Backend: Google Sheets            ║
+// ╠══════════════════════════════════════════════════════════════════════════════╣
+// ║  @domain    Segurança Viária — Observatório de Sinistros Rodoviários/AM     ║
+// ║  @author    Paulo Esteves Fernandes Neto — Chefe DMOB/SEINFRA-AM            ║
+// ║  @version   1.0.0-ake                                                       ║
+// ║  @build     GENESIS_RETROFIT                                                ║
+// ║  @created   2026-03-24                                                      ║
+// ║  @repo      github.com/leonzordhue/rodovias-am-dashboard                    ║
+// ║                                                                              ║
+// ║  CLASSIFICAÇÃO AKE:                                                          ║
+// ║    Perfil:        Dependente (Library remota via Google Sheets gviz/tq)      ║
+// ║    Camada 1 (Library):   REMOTA — Planilha pública Google Sheets (CSV)      ║
+// ║    Camada 2 (Logic):     Parser CSV, normalização de rodovias, agregações   ║
+// ║    Camada 3 (Metadata):  JSDoc de autoridade em axiomas                      ║
+// ║    Camada 4 (Log):       AKE_BUILD_LOG ativo                                ║
+// ║    Camada 5 (Evolution): Pronto para iteração evolutiva                     ║
+// ║    Camada 6 (UI):        Chart.js + Tabela paginada + KPIs + CSV export     ║
+// ║                                                                              ║
+// ║  DEPENDÊNCIAS EXTERNAS:                                                      ║
+// ║    - Google Sheets gviz/tq endpoint (DADOS — ponto de falha)                ║
+// ║    - Chart.js 4.4.0 (gráficos)                                              ║
+// ║    - Google Fonts: Outfit                                                    ║
+// ║                                                                              ║
+// ║  ⚠ NOTA AKE-SOV: Este arquivo NÃO é soberano. Os dados dependem da         ║
+// ║  disponibilidade da planilha Google. Em caso de indisponibilidade, o         ║
+// ║  sistema exibe estado vazio. Candidato a futura migração para Library        ║
+// ║  interna com snapshot periódico.                                             ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ============================================================================
+// CAMADA 4 — LOG ENGINE (AKE_BUILD_LOG)
+// Regra AKE-LOG-001: Nenhuma entrada pode ser removida.
+// Regra AKE-LOG-002: A IA deve consultar este log antes de qualquer modificação.
+// ============================================================================
+var AKE_BUILD_LOG = [
+  {
+    build: "1.0.0-ake",
+    data: "2026-03-24T10:00:00-04:00",
+    autor: "Paulo Esteves Fernandes Neto",
+    ia_assistente: "Claude Opus 4.6",
+    tipo: "GENESIS_RETROFIT",
+    descricao: "Retrofit AKE aplicado ao index_dashboard.html existente. Nenhuma funcionalidade alterada. Perfil Dependente — Library remota via Google Sheets.",
+    estado_pre_retrofit: {
+      linhas: 823,
+      funcionalidade: "100% operacional",
+      dados: "Planilha Google Sheets (gviz/tq CSV) — aba 'Noticias'",
+      sheet_id: "1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE",
+      charts: "5 (rodovias, acidentes, municípios, via, mensal)",
+      kpis: "4 (total, rodovias, municípios, fatais)",
+      tabela: "Paginada com filtros e exportação CSV"
+    },
+    decisoes: [
+      "Classificar como Perfil Dependente — Library remota, não soberano",
+      "Documentar endpoint gviz/tq como ponto de falha único",
+      "JSDoc aplicado em normalizarRodovia(), parseCSV(), contarPor(), renderKPIs(), renderCharts()",
+      "Registrar candidatura a migração futura para Library interna com snapshot",
+      "Manter var em vez de const — código original usa ES5 por design"
+    ],
+    axiomas_identificados: [
+      "normalizarRodovia() — Normalização de siglas rodoviárias (BR-xxx, AM-xxx)",
+      "parseCSV() — Parser CSV determinístico com suporte a campos com aspas",
+      "contarPor() — Agregação genérica por campo categórico com exclusão",
+      "topN() — Ranking por contagem decrescente (top N)",
+      "renderKPIs() — Cálculo de indicadores: total, rodovias únicas, municípios, fatais",
+      "renderCharts() — 5 visualizações: rodovias, acidentes, municípios, via, evolução mensal",
+      "badgeVia() / badgeTipo() — Classificação visual por jurisdição e gravidade"
+    ],
+    tentativas_falhas: [],
+    erros_corrigidos: []
+  }
+];
+
+// ============================================================================
+// CAMADA 1 — THE LIBRARY (Conhecimento Estático / Remoto)
+// ⚠ Library REMOTA — dados carregados via fetch em tempo de execução.
+// Regra AKE-LIB-001: Fonte documentada mesmo quando remota.
+// ============================================================================
+
+/**
+ * @meta Metadados de proveniência da fonte de dados
+ * @source Google News RSS (coleta automatizada) → Google Sheets (armazenamento)
+ * @description Notícias de sinistros rodoviários no Amazonas coletadas via
+ *              Google News RSS e armazenadas em planilha pública. Campos incluem
+ *              Data/Hora, Título, Fonte, Rodovia, Município, Tipo de Via,
+ *              Tipo de Acidente/Sinistro, Link.
+ * @endpoint gviz/tq?tqx=out:csv — endpoint público Google Sheets
+ * @sheet_id 1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE
+ * @sheet_name Noticias
+ * @update_frequency Diária (coleta RSS automatizada)
+ * @responsible Paulo E. F. Neto — DMOB/SEINFRA-AM
+ * @sovereignty DEPENDENTE — dados residem em servidor externo (Google)
+ * @ake_rule AKE-LIB-001
+ */
+
+// ── Configuração da Fonte Remota ──
 var SHEET_ID   = '1y7h-FRn0jBfhlr9e7EwDBNES-0hCUhSeAf5s4tVEWxE';
 var SHEET_NAME = 'Noticias';
 // Força cache-bust a cada carga
@@ -433,7 +529,22 @@ function destruirCharts() {
   charts = {};
 }
 
-// ================== NORMALIZAÇÃO ==================
+// ============================================================================
+// CAMADA 2 — THE LOGIC CORE (Motor Axiomático)
+// Regra AKE-AXM-001: Nenhuma função de cálculo sem citação de fonte.
+// ============================================================================
+
+/**
+ * AXIOMA: Normalização de siglas rodoviárias brasileiras
+ * @source  DNIT — Sistema Nacional de Viação (SNV). Padrão: XX-NNN
+ *          onde XX = jurisdição (BR/AM) e NNN = número da rodovia.
+ *          Dados de entrada vêm de scraping RSS com formatação inconsistente.
+ * @logic   Regex captura padrão (BR|AM) seguido de 2-3 dígitos, normaliza para XX-NNN
+ * @domain  Válido para rodovias federais (BR) e estaduais (AM) do Amazonas
+ * @axiom_type Computacional (regex + normalização de string)
+ * @sanity_check normalizarRodovia("br174") === "BR-174"
+ * @ake_rule AKE-AXM-001
+ */
 function normalizarRodovia(rod) {
   if (!rod || rod === 'Nao identificada') return rod;
   var r = rod.trim().toUpperCase();
@@ -509,7 +620,15 @@ function carregarDados() {
     });
 }
 
-// ================== PARSER CSV ==================
+/**
+ * AXIOMA: Parser CSV determinístico com suporte a campos com aspas
+ * @source  RFC 4180 — Common Format and MIME Type for CSV Files
+ * @logic   Split por linhas, extrai headers, mapeia valores por índice.
+ *          parseCSVLine() trata campos entre aspas duplas e escapes ("").
+ * @domain  Válido para qualquer CSV UTF-8 com headers na primeira linha
+ * @axiom_type Computacional (parser determinístico)
+ * @ake_rule AKE-AXM-001
+ */
 function parseCSV(csv) {
   if (!csv || !csv.trim()) return [];
   var lines = csv.trim().split('\n');
@@ -572,7 +691,15 @@ function popularDropdowns() {
   }
 }
 
-// ================== KPIs ==================
+/**
+ * AXIOMA: Cálculo de indicadores-chave de sinistralidade
+ * @source  Dados coletados de Google News RSS — classificação manual e automática
+ * @logic   Total = count(registros) | Rodovias = count(unique(Rodovia)) excl. "Nao identificada" |
+ *          Municípios = count(unique(Município)) excl. vazios | Fatais = count(tipo contains "fatal")
+ * @domain  Válido para qualquer conjunto de registros com campos Rodovia, Município, Tipo de Acidente
+ * @axiom_type Computacional (agregação Set + contagem condicional)
+ * @ake_rule AKE-AXM-001
+ */
 function renderKPIs() {
   var total = todosRegistros.length;
   var rodSet = new Set(todosRegistros
@@ -604,6 +731,12 @@ var CHART_OPT = {
   }
 };
 
+/**
+ * AXIOMA: Agregação genérica por campo categórico
+ * @logic   Conta ocorrências de cada valor único em um campo, excluindo valores especificados
+ * @axiom_type Computacional (reduce sobre campo categórico)
+ * @ake_rule AKE-AXM-001
+ */
 function contarPor(lista, campo, excluir) {
   excluir = excluir || [];
   var cnt = {};
@@ -615,10 +748,28 @@ function contarPor(lista, campo, excluir) {
   return cnt;
 }
 
+/**
+ * AXIOMA: Ranking por contagem decrescente (top N)
+ * @logic   Ordena entries por valor desc, retorna primeiros N
+ * @axiom_type Computacional (sort + slice determinístico)
+ * @ake_rule AKE-AXM-001
+ */
 function topN(obj, n) {
   return Object.entries(obj).sort(function(a,b) { return b[1]-a[1]; }).slice(0, n);
 }
 
+/**
+ * AXIOMA: Visualização estatística de sinistros — 5 gráficos
+ * @source  Dados da planilha Google Sheets — campos Rodovia, Tipo de Acidente,
+ *          Município, Tipo de Via, Data/Hora
+ * @logic   Chart 1: Top 10 rodovias por nº de sinistros (bar horizontal)
+ *          Chart 2: Distribuição por tipo de acidente (doughnut)
+ *          Chart 3: Top 8 municípios afetados (bar vertical)
+ *          Chart 4: Jurisdição Federal vs Estadual (pie)
+ *          Chart 5: Evolução mensal (line com fill)
+ * @axiom_type Computacional (agregação + visualização determinística)
+ * @ake_rule AKE-AXM-001
+ */
 function renderCharts() {
   destruirCharts();
 
@@ -686,19 +837,37 @@ function renderCharts() {
   }
 }
 
-// ================== TABELA ==================
+/**
+ * AXIOMA: Classificação visual por jurisdição viária
+ * @source  DNIT — Sistema Nacional de Viação: Federal (BR) ou Estadual (AM)
+ * @axiom_type Normativo (regra condicional com base no SNV)
+ * @ake_rule AKE-AXM-001
+ */
 function badgeVia(v) {
   if (!v) return '<span class="badge badge-ni">—</span>';
   if (v === 'Federal')  return '<span class="badge badge-federal">Federal</span>';
   if (v === 'Estadual') return '<span class="badge badge-estadual">Estadual</span>';
   return '<span class="badge badge-ni">N/I</span>';
 }
+/**
+ * AXIOMA: Classificação visual por gravidade do sinistro
+ * @source  Classificação DMOB: "fatal" = badge vermelho, demais = badge neutro
+ * @axiom_type Normativo (regra condicional por keyword)
+ * @ake_rule AKE-AXM-001
+ */
 function badgeTipo(v) {
   if (!v) return '<span class="badge badge-geral">—</span>';
   if (v.toLowerCase().includes('fatal')) return '<span class="badge badge-fatal">' + v + '</span>';
   return '<span class="badge badge-geral">' + v + '</span>';
 }
 
+// ============================================================================
+// CAMADA 6 — THE UI (Interface Reativa)
+// Tabela paginada, filtros, exportação CSV, loader, alertas.
+// Regra AKE-UI-001: Zero lógica de negócio na UI.
+// ============================================================================
+
+// ── UI: Filtros e Tabela ──
 function aplicarFiltros() {
   var q        = (document.getElementById('searchInput').value || '').toLowerCase();
   var rodSel   = document.getElementById('rodoviaSelect').value;
@@ -793,7 +962,7 @@ function irPagina(p) {
   if (tc) tc.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ================== EXPORTAR CSV ==================
+// ── UI: Exportação CSV ──
 function exportarCSV() {
   if (!registrosFiltro.length) { showAlert('Carregue os dados primeiro.', 'error'); return; }
   var cols = Object.keys(registrosFiltro[0]);
@@ -808,7 +977,9 @@ function exportarCSV() {
   a.click();
 }
 
-// ================== INIT ==================
+// ============================================================================
+// INICIALIZAÇÃO
+// ============================================================================
 window.addEventListener('load', function() {
   carregarDados();
 });
